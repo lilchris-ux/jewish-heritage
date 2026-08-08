@@ -23,7 +23,9 @@ numbers below map to the master prompt's numbering where relevant.
 
 ## 1. Exact framework
 
-- **Next.js 15** (App Router, React Server Components) + **React 19** + **TypeScript** (strict).
+- **Next.js 16** (App Router, React Server Components) + **React 19** + **TypeScript** (strict).
+  (Originally planned as Next 15; Payload 3.87's peer range excludes the current
+  15.5.x line and targets `>=16.2.6 <17`, so 16 is the supported choice.)
 - **Tailwind CSS v4** for styling, using **CSS logical properties** throughout so the Hebrew
   RTL layout is automatic rather than a second stylesheet.
 - **Node 22** runtime (Payload 3 requires Node 20+; the build container already has 22.22.2).
@@ -653,7 +655,7 @@ survives.
 
 ## Build sequence once approved
 
-1. Scaffold Next.js 15 + Payload 3 + Tailwind v4; `netlify.toml`; `.env.example`.
+1. Scaffold Next.js 16 + Payload 3 + Tailwind v4; `netlify.toml`; `.env.example`.
 2. Payload config: database, storage, localization, email, access control.
 3. Collections, globals, blocks, migrations.
 4. Design system: tokens, typography, base components.
