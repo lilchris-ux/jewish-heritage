@@ -3,10 +3,37 @@
 A Jewish heritage travel platform for Morocco: a premium public website plus a
 production CMS at `/admin`, deployed to Netlify from this repository.
 
-**Status: Stage 1 of 10.** The foundation is built and verified — Next.js +
-Payload, the Tours model, role-based access, and trilingual content. The
-remaining collections, page templates and conversion features follow in later
-stages. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full plan.
+**Status: application complete, awaiting deployment.** The public site, the
+CMS, the conversion layer and the SEO layer are all built and verified against
+a real database and a real browser. What remains is deployment, which needs
+accounts only the site owner can create — see
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design rationale and
+[`docs/TRACKING.md`](docs/TRACKING.md) for the conversion events.
+
+## What's built
+
+**Content model** — Tours (with itinerary, pricing, availability), Departures,
+Heritage Sites (with cited sources), Destinations, Experiences, Articles,
+Categories, FAQs, block-built Pages, Inquiries, Media, Users. Site Settings and
+Navigation as globals.
+
+**Public site** — Home, tours index and detail, heritage sites index and
+detail, destinations index and detail, travel guide index and article, FAQ,
+contact, thank-you, 404, plus CMS-built landing pages at any slug.
+
+**Three languages** — English at the root, French and Hebrew prefixed, with
+Hebrew laid out right-to-left and untranslated fields falling back to English.
+
+**Conversion** — WhatsApp deep links with the tour pre-filled, a sticky mobile
+action bar, a tour-page sidebar, and an inquiry form that writes to the
+database and emails a notification.
+
+**SEO** — per-page metadata from the CMS, canonicals, hreflang across all three
+locales, breadcrumbs, JSON-LD (TravelAgency, TouristTrip, TouristAttraction,
+Place, BlogPosting, FAQPage, BreadcrumbList), a database-driven sitemap and
+robots.txt.
 
 ## Stack
 
@@ -55,6 +82,7 @@ super-admin account.
 | `npm run generate:types` | Regenerate `src/payload-types.ts` after schema edits |
 | `npm run generate:importmap` | Regenerate the admin import map |
 | `npm run migrate:create` | Create a SQL migration from config changes |
+| `npm run seed` | Create the page skeleton, navigation and settings |
 
 ## Schema changes
 

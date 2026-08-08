@@ -7,6 +7,12 @@ import {
 } from '../access/roles'
 import { slugFromField } from '../lib/slug'
 import { seoFields } from '../lib/seo'
+import { revalidateCollection } from '../hooks/revalidate'
+
+const { afterChange, afterDelete } = revalidateCollection(
+  (doc) => (doc.slug ? `/tours/${doc.slug}` : null),
+  ['/tours', '/'],
+)
 
 export const Tours: CollectionConfig = {
   slug: 'tours',
@@ -21,6 +27,8 @@ export const Tours: CollectionConfig = {
   },
   versions: { drafts: true },
   hooks: {
+    afterChange,
+    afterDelete,
     beforeChange: [
       ({ data, req, originalDoc }) => {
         // Payload owns `_status`; editors may write content but not publish it.

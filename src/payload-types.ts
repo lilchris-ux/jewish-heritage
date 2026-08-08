@@ -67,9 +67,18 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
-    media: Media;
+    pages: Page;
     tours: Tour;
+    departures: Departure;
+    'heritage-sites': HeritageSite;
+    destinations: Destination;
+    experiences: Experience;
+    posts: Post;
+    categories: Category;
+    faqs: Faq;
+    inquiries: Inquiry;
+    media: Media;
+    users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -77,9 +86,18 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     tours: ToursSelect<false> | ToursSelect<true>;
+    departures: DeparturesSelect<false> | DeparturesSelect<true>;
+    'heritage-sites': HeritageSitesSelect<false> | HeritageSitesSelect<true>;
+    destinations: DestinationsSelect<false> | DestinationsSelect<true>;
+    experiences: ExperiencesSelect<false> | ExperiencesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
+    inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -89,8 +107,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'fr' | 'he') | ('en' | 'fr' | 'he')[];
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+    navigation: Navigation;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    navigation: NavigationSelect<false> | NavigationSelect<true>;
+  };
   locale: 'en' | 'fr' | 'he';
   widgets: {
     collections: CollectionsWidget;
@@ -120,34 +144,149 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Built from blocks. Marketing landing pages are created here — no developer needed.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "pages".
  */
-export interface User {
+export interface Page {
   id: number;
-  name: string;
+  title: string;
   /**
-   * Controls what this person can see and do in the CMS.
+   * Use "home" for the homepage. Otherwise this becomes the URL.
    */
-  role: 'super-admin' | 'client-admin' | 'editor';
+  slug: string;
+  layout?:
+    | (
+        | {
+            eyebrow?: string | null;
+            heading: string;
+            subheading?: string | null;
+            image?: (number | null) | Media;
+            ctaLabel?: string | null;
+            ctaHref?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            heading?: string | null;
+            content?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            heading?: string | null;
+            content?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            image?: (number | null) | Media;
+            imagePosition?: ('start' | 'end') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'imageText';
+          }
+        | {
+            heading?: string | null;
+            intro?: string | null;
+            /**
+             * Leave empty to show the most recently published tours.
+             */
+            tours?: (number | Tour)[] | null;
+            limit?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'tourGrid';
+          }
+        | {
+            heading?: string | null;
+            intro?: string | null;
+            sites?: (number | HeritageSite)[] | null;
+            limit?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'heritageGrid';
+          }
+        | {
+            heading?: string | null;
+            intro?: string | null;
+            destinations?: (number | Destination)[] | null;
+            limit?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'destinationGrid';
+          }
+        | {
+            heading?: string | null;
+            scope?: ('general' | 'booking') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faqAccordion';
+          }
+        | {
+            heading: string;
+            body?: string | null;
+            showInquiryButton?: boolean | null;
+            showWhatsAppButton?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'ctaBanner';
+          }
+        | {
+            heading?: string | null;
+            intro?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'inquiryForm';
+          }
+      )[]
+    | null;
+  /**
+   * Around 60 characters. Falls back to the title if left blank.
+   */
+  metaTitle?: string | null;
+  /**
+   * Around 155 characters. Falls back to the short description if left blank.
+   */
+  metaDescription?: string | null;
+  /**
+   * Image shown when the page is shared. Falls back to the hero image.
+   */
+  ogImage?: (number | null) | Media;
+  /**
+   * Hide this page from search engines.
+   */
+  noindex?: boolean | null;
   updatedAt: string;
   createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -320,6 +459,413 @@ export interface Tour {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "heritage-sites".
+ */
+export interface HeritageSite {
+  id: number;
+  name: string;
+  /**
+   * Leave blank to generate from the name.
+   */
+  slug: string;
+  siteType:
+    'synagogue' | 'cemetery' | 'rabbinical-tomb' | 'mellah' | 'jewish-quarter' | 'museum' | 'landmark' | 'other';
+  destination?: (number | null) | Destination;
+  city?: string | null;
+  region?: string | null;
+  shortDescription?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  images?: (number | Media)[] | null;
+  /**
+   * Historical background. Record only what can be supported — cite your sources below.
+   */
+  historicalInfo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Where the history above comes from. Keeping sources here is how the site stays factual.
+   */
+  historicalSources?:
+    | {
+        title: string;
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Access, opening times, dress code, photography rules.
+   */
+  visitingInfo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  relatedTours?: (number | Tour)[] | null;
+  relatedSites?: (number | HeritageSite)[] | null;
+  /**
+   * Around 60 characters. Falls back to the title if left blank.
+   */
+  metaTitle?: string | null;
+  /**
+   * Around 155 characters. Falls back to the short description if left blank.
+   */
+  metaDescription?: string | null;
+  /**
+   * Image shown when the page is shared. Falls back to the hero image.
+   */
+  ogImage?: (number | null) | Media;
+  /**
+   * Hide this page from search engines.
+   */
+  noindex?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "destinations".
+ */
+export interface Destination {
+  id: number;
+  name: string;
+  slug: string;
+  heroImage?: (number | null) | Media;
+  shortDescription?: string | null;
+  overview?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * This destination's Jewish heritage and community history.
+   */
+  jewishHeritage?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  historicalSignificance?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  gallery?: (number | Media)[] | null;
+  /**
+   * Around 60 characters. Falls back to the title if left blank.
+   */
+  metaTitle?: string | null;
+  /**
+   * Around 155 characters. Falls back to the short description if left blank.
+   */
+  metaDescription?: string | null;
+  /**
+   * Image shown when the page is shared. Falls back to the hero image.
+   */
+  ogImage?: (number | null) | Media;
+  /**
+   * Hide this page from search engines.
+   */
+  noindex?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Dated departures. A tour with no departures listed is shown as available on request, never as running year-round.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departures".
+ */
+export interface Departure {
+  id: number;
+  tour: number | Tour;
+  startDate: string;
+  endDate?: string | null;
+  status: 'open' | 'limited' | 'closed' | 'cancelled';
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "experiences".
+ */
+export interface Experience {
+  id: number;
+  title: string;
+  slug: string;
+  summary?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  image?: (number | null) | Media;
+  destinations?: (number | Destination)[] | null;
+  relatedTours?: (number | Tour)[] | null;
+  seo?: {
+    /**
+     * Around 60 characters. Falls back to the title if left blank.
+     */
+    metaTitle?: string | null;
+    /**
+     * Around 155 characters. Falls back to the short description if left blank.
+     */
+    metaDescription?: string | null;
+    /**
+     * Image shown when the page is shared. Falls back to the hero image.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Hide this page from search engines.
+     */
+    noindex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  featuredImage?: (number | null) | Media;
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  category?: (number | null) | Category;
+  author?: (number | null) | User;
+  publishedAt?: string | null;
+  relatedTours?: (number | Tour)[] | null;
+  relatedSites?: (number | HeritageSite)[] | null;
+  /**
+   * Around 60 characters. Falls back to the title if left blank.
+   */
+  metaTitle?: string | null;
+  /**
+   * Around 155 characters. Falls back to the short description if left blank.
+   */
+  metaDescription?: string | null;
+  /**
+   * Image shown when the page is shared. Falls back to the hero image.
+   */
+  ogImage?: (number | null) | Media;
+  /**
+   * Hide this page from search engines.
+   */
+  noindex?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  name: string;
+  /**
+   * Controls what this person can see and do in the CMS.
+   */
+  role: 'super-admin' | 'client-admin' | 'editor';
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  scope: 'general' | 'booking' | 'tour' | 'destination';
+  tour?: (number | null) | Tour;
+  destination?: (number | null) | Destination;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiries".
+ */
+export interface Inquiry {
+  id: number;
+  status: 'new' | 'contacted' | 'qualified' | 'quoted' | 'booked' | 'lost';
+  assignedTo?: (number | null) | User;
+  fullName: string;
+  email: string;
+  country?: string | null;
+  phone?: string | null;
+  preferredDates?: string | null;
+  travellers?: number | null;
+  tripDuration?: string | null;
+  tourInterest?: (number | null) | Tour;
+  tripStyle?: ('private' | 'group' | 'either') | null;
+  interests?:
+    ('synagogues' | 'cemeteries' | 'rabbinical-tombs' | 'mellahs' | 'family-roots' | 'culture' | 'general')[] | null;
+  message?: string | null;
+  sourcePage?: string | null;
+  referrer?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmTerm?: string | null;
+  utmContent?: string | null;
+  internalNotes?:
+    | {
+        note: string;
+        author?: (number | null) | User;
+        createdAt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -343,16 +889,52 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'tours';
+        value: number | Tour;
+      } | null)
+    | ({
+        relationTo: 'departures';
+        value: number | Departure;
+      } | null)
+    | ({
+        relationTo: 'heritage-sites';
+        value: number | HeritageSite;
+      } | null)
+    | ({
+        relationTo: 'destinations';
+        value: number | Destination;
+      } | null)
+    | ({
+        relationTo: 'experiences';
+        value: number | Experience;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'inquiries';
+        value: number | Inquiry;
       } | null)
     | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'tours';
-        value: number | Tour;
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -398,47 +980,108 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "pages_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
-  role?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  layout?:
     | T
     | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              subheading?: T;
+              image?: T;
+              ctaLabel?: T;
+              ctaHref?: T;
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              heading?: T;
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        imageText?:
+          | T
+          | {
+              heading?: T;
+              content?: T;
+              image?: T;
+              imagePosition?: T;
+              id?: T;
+              blockName?: T;
+            };
+        tourGrid?:
+          | T
+          | {
+              heading?: T;
+              intro?: T;
+              tours?: T;
+              limit?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heritageGrid?:
+          | T
+          | {
+              heading?: T;
+              intro?: T;
+              sites?: T;
+              limit?: T;
+              id?: T;
+              blockName?: T;
+            };
+        destinationGrid?:
+          | T
+          | {
+              heading?: T;
+              intro?: T;
+              destinations?: T;
+              limit?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faqAccordion?:
+          | T
+          | {
+              heading?: T;
+              scope?: T;
+              id?: T;
+              blockName?: T;
+            };
+        ctaBanner?:
+          | T
+          | {
+              heading?: T;
+              body?: T;
+              showInquiryButton?: T;
+              showWhatsAppButton?: T;
+              id?: T;
+              blockName?: T;
+            };
+        inquiryForm?:
+          | T
+          | {
+              heading?: T;
+              intro?: T;
+              id?: T;
+              blockName?: T;
+            };
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  caption?: T;
-  credit?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  ogImage?: T;
+  noindex?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -503,6 +1146,225 @@ export interface ToursSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departures_select".
+ */
+export interface DeparturesSelect<T extends boolean = true> {
+  tour?: T;
+  startDate?: T;
+  endDate?: T;
+  status?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "heritage-sites_select".
+ */
+export interface HeritageSitesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  siteType?: T;
+  destination?: T;
+  city?: T;
+  region?: T;
+  shortDescription?: T;
+  description?: T;
+  images?: T;
+  historicalInfo?: T;
+  historicalSources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        id?: T;
+      };
+  visitingInfo?: T;
+  relatedTours?: T;
+  relatedSites?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  ogImage?: T;
+  noindex?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "destinations_select".
+ */
+export interface DestinationsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  heroImage?: T;
+  shortDescription?: T;
+  overview?: T;
+  jewishHeritage?: T;
+  historicalSignificance?: T;
+  gallery?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  ogImage?: T;
+  noindex?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "experiences_select".
+ */
+export interface ExperiencesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  summary?: T;
+  description?: T;
+  image?: T;
+  destinations?: T;
+  relatedTours?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+        noindex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  featuredImage?: T;
+  excerpt?: T;
+  content?: T;
+  category?: T;
+  author?: T;
+  publishedAt?: T;
+  relatedTours?: T;
+  relatedSites?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  ogImage?: T;
+  noindex?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  scope?: T;
+  tour?: T;
+  destination?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiries_select".
+ */
+export interface InquiriesSelect<T extends boolean = true> {
+  status?: T;
+  assignedTo?: T;
+  fullName?: T;
+  email?: T;
+  country?: T;
+  phone?: T;
+  preferredDates?: T;
+  travellers?: T;
+  tripDuration?: T;
+  tourInterest?: T;
+  tripStyle?: T;
+  interests?: T;
+  message?: T;
+  sourcePage?: T;
+  referrer?: T;
+  utmSource?: T;
+  utmMedium?: T;
+  utmCampaign?: T;
+  utmTerm?: T;
+  utmContent?: T;
+  internalNotes?:
+    | T
+    | {
+        note?: T;
+        author?: T;
+        createdAt?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  credit?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -540,6 +1402,135 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  companyName?: string | null;
+  logo?: (number | null) | Media;
+  tagline?: string | null;
+  address?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  /**
+   * International format, digits only, no + or spaces. Example: 212600000000. Changing it here updates every WhatsApp button on the site — no redeploy needed.
+   */
+  whatsappNumber?: string | null;
+  /**
+   * Pre-filled text. On a tour page the tour name is appended automatically.
+   */
+  whatsappMessage?: string | null;
+  socialLinks?:
+    | {
+        platform: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  defaultMetaTitle?: string | null;
+  defaultMetaDescription?: string | null;
+  defaultOgImage?: (number | null) | Media;
+  /**
+   * Google Tag Manager container ID, e.g. GTM-XXXXXXX.
+   */
+  gtmContainerId?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation".
+ */
+export interface Navigation {
+  id: number;
+  header?:
+    | {
+        label: string;
+        /**
+         * A path such as /tours, or a full URL.
+         */
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  footer?:
+    | {
+        title?: string | null;
+        links?:
+          | {
+              label: string;
+              /**
+               * A path such as /tours, or a full URL.
+               */
+              href: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  companyName?: T;
+  logo?: T;
+  tagline?: T;
+  address?: T;
+  email?: T;
+  phone?: T;
+  whatsappNumber?: T;
+  whatsappMessage?: T;
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  defaultMetaTitle?: T;
+  defaultMetaDescription?: T;
+  defaultOgImage?: T;
+  gtmContainerId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation_select".
+ */
+export interface NavigationSelect<T extends boolean = true> {
+  header?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  footer?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

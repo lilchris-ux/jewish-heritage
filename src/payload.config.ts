@@ -8,6 +8,17 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Tours } from './collections/Tours'
+import { HeritageSites } from './collections/HeritageSites'
+import { Destinations } from './collections/Destinations'
+import { Experiences } from './collections/Experiences'
+import { Posts } from './collections/Posts'
+import { Categories } from './collections/Categories'
+import { Faqs } from './collections/Faqs'
+import { Departures } from './collections/Departures'
+import { Pages } from './collections/Pages'
+import { Inquiries } from './collections/Inquiries'
+import { SiteSettings } from './globals/SiteSettings'
+import { Navigation } from './globals/Navigation'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -23,7 +34,22 @@ export default buildConfig({
     },
   },
 
-  collections: [Users, Media, Tours],
+  collections: [
+    Pages,
+    Tours,
+    Departures,
+    HeritageSites,
+    Destinations,
+    Experiences,
+    Posts,
+    Categories,
+    Faqs,
+    Inquiries,
+    Media,
+    Users,
+  ],
+
+  globals: [SiteSettings, Navigation],
 
   editor: lexicalEditor(),
 
